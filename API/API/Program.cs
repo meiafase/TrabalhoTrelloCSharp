@@ -66,5 +66,7 @@ app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices
 
 });
 
+app.MapGet("/api/ola", () => "Olá Mundo!");
+
 
 app.Run();
