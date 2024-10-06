@@ -6,21 +6,58 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class AdicionandoTabelasNoBD : Migration
+    public partial class CriandoTabelas : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Usuarios",
+                columns: table => new
+                {
+                    IdUsuario = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    EmailUsuario = table.Column<string>(type: "TEXT", nullable: true),
+                    NomeUsuario = table.Column<string>(type: "TEXT", nullable: true),
+                    SenhaUsuario = table.Column<string>(type: "TEXT", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Usuarios", x => x.IdUsuario);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Quadros",
+                columns: table => new
+                {
+                    IdQuadro = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    IdUsuario = table.Column<int>(type: "INTEGER", nullable: false),
+                    TituloQuadro = table.Column<string>(type: "TEXT", nullable: true),
+                    CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Quadros", x => x.IdQuadro);
+                    table.ForeignKey(
+                        name: "FK_Quadros_Usuarios_IdUsuario",
+                        column: x => x.IdUsuario,
+                        principalTable: "Usuarios",
+                        principalColumn: "IdUsuario",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Tarefas",
                 columns: table => new
                 {
                     IdTarefa = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    IdUsuario = table.Column<int>(type: "INTEGER", nullable: false),
-                    IdQuadro = table.Column<int>(type: "INTEGER", nullable: false),
-                    DescricaoTarefa = table.Column<string>(type: "TEXT", nullable: false),
-                    DataEntregaTarefa = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IdUsuario = table.Column<int>(type: "INTEGER", nullable: true),
+                    IdQuadro = table.Column<int>(type: "INTEGER", nullable: true),
+                    DescricaoTarefa = table.Column<string>(type: "TEXT", nullable: true),
+                    DataEntregaTarefa = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -30,14 +67,12 @@ namespace API.Migrations
                         name: "FK_Tarefas_Quadros_IdQuadro",
                         column: x => x.IdQuadro,
                         principalTable: "Quadros",
-                        principalColumn: "IdQuadro",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "IdQuadro");
                     table.ForeignKey(
                         name: "FK_Tarefas_Usuarios_IdUsuario",
                         column: x => x.IdUsuario,
                         principalTable: "Usuarios",
-                        principalColumn: "IdUsuario",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "IdUsuario");
                 });
 
             migrationBuilder.CreateTable(
@@ -48,7 +83,7 @@ namespace API.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     IdUsuario = table.Column<int>(type: "INTEGER", nullable: false),
                     IdTarefa = table.Column<int>(type: "INTEGER", nullable: false),
-                    Comentario = table.Column<string>(type: "TEXT", nullable: false),
+                    Comentario = table.Column<string>(type: "TEXT", nullable: true),
                     CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -79,6 +114,11 @@ namespace API.Migrations
                 column: "IdUsuario");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Quadros_IdUsuario",
+                table: "Quadros",
+                column: "IdUsuario");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Tarefas_IdQuadro",
                 table: "Tarefas",
                 column: "IdQuadro");
@@ -97,6 +137,12 @@ namespace API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tarefas");
+
+            migrationBuilder.DropTable(
+                name: "Quadros");
+
+            migrationBuilder.DropTable(
+                name: "Usuarios");
         }
     }
 }

@@ -6,7 +6,7 @@ namespace API.Models;
 
 public class Tarefas
 {
-[Key]
+    [Key]
     public int IdTarefa { get; set; }
     
     public int? IdUsuario { get; set; }

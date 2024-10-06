@@ -24,7 +24,6 @@ namespace API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Comentario")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CriadoEm")
@@ -58,7 +57,6 @@ namespace API.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TituloQuadro")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("IdQuadro");
@@ -77,17 +75,16 @@ namespace API.Migrations
                     b.Property<DateTime>("CriadoEm")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("DataEntregaTarefa")
+                    b.Property<DateTime?>("DataEntregaTarefa")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DescricaoTarefa")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("IdQuadro")
+                    b.Property<int?>("IdQuadro")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("IdUsuario")
+                    b.Property<int?>("IdUsuario")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("IdTarefa");
@@ -156,15 +153,11 @@ namespace API.Migrations
                 {
                     b.HasOne("API.Models.Quadros", "Quadro")
                         .WithMany("Tarefas")
-                        .HasForeignKey("IdQuadro")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IdQuadro");
 
                     b.HasOne("API.Models.Usuarios", "Usuario")
                         .WithMany("Tarefas")
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("IdUsuario");
 
                     b.Navigation("Quadro");
 
