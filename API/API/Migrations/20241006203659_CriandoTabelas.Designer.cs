@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace API.Migrations
 {
     [DbContext(typeof(AppDataContext))]
-    [Migration("20241006201625_CriandoTabelas")]
+    [Migration("20241006203659_CriandoTabelas")]
     partial class CriandoTabelas
     {
         /// <inheritdoc />
@@ -89,6 +89,9 @@ namespace API.Migrations
 
                     b.Property<int?>("IdUsuario")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("TituloTarefa")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("IdTarefa");
 

@@ -7,8 +7,8 @@ public class AppDataContext : DbContext
 {
     public DbSet<Usuarios> Usuarios { get; set; }
     public DbSet<Quadros> Quadros { get; set; }
-    public DbSet<Quadros> Tarefas { get; set; }
-    public DbSet<Quadros> Comentarios { get; set; }
+    public DbSet<Tarefas> Tarefas { get; set; }
+    public DbSet<Comentarios> Comentarios { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

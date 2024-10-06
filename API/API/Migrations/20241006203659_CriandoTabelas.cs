@@ -56,6 +56,7 @@ namespace API.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     IdUsuario = table.Column<int>(type: "INTEGER", nullable: true),
                     IdQuadro = table.Column<int>(type: "INTEGER", nullable: true),
+                    TituloTarefa = table.Column<string>(type: "TEXT", nullable: true),
                     DescricaoTarefa = table.Column<string>(type: "TEXT", nullable: true),
                     DataEntregaTarefa = table.Column<DateTime>(type: "TEXT", nullable: true),
                     CriadoEm = table.Column<DateTime>(type: "TEXT", nullable: false)

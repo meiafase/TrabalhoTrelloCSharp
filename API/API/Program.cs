@@ -62,7 +62,7 @@ app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices
     ctx.Quadros.Add(quadro);
     await ctx.SaveChangesAsync();
 
-    return Results.Created($"/api/usuario/{quadro.IdQuadro}", quadro);
+    return Results.Created($"/api/quadro/{quadro.IdQuadro}", quadro);
 
 });
 
@@ -88,6 +88,32 @@ app.MapDelete("/api/quadro/deletar/{id}", async (int id, [FromServices] AppDataC
     await ctx.SaveChangesAsync();
 
     return Results.Ok("Quadro deletado com sucesso.");
+});
+
+app.MapPost("/api/tarefa/criar", async ([FromBody] Tarefas tarefa, [FromServices] AppDataContext ctx) =>
+{
+    // Validação para verificar se o título e a descrição foram fornecidos
+    if (string.IsNullOrEmpty(tarefa.TituloTarefa) || string.IsNullOrEmpty(tarefa.DescricaoTarefa))
+    {
+        return Results.BadRequest("Título e Descrição são obrigatórios.");
+    }
+
+    // Certificar-se de que o Id do quadro existe no banco de dados
+    var quadro = await ctx.Quadros.FindAsync(tarefa.IdQuadro);
+    if (quadro == null)
+    {
+        return Results.BadRequest("Quadro não encontrado.");
+    }
+
+    // Adicionar a nova tarefa ao contexto
+    ctx.Tarefas.Add(tarefa);
+
+    // Salvar as alterações no banco de dados
+    await ctx.SaveChangesAsync();
+
+    // Retornar o status 201 Created com a URI da nova tarefa
+    return Results.Created($"/api/tarefa/{tarefa.IdTarefa}", tarefa);
+
 });
 
 
