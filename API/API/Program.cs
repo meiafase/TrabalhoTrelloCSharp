@@ -66,7 +66,29 @@ app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices
 
 });
 
-app.MapGet("/api/ola", () => "Olá Mundo!");
+
+app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadroAtualizado, [FromServices] AppDataContext ctx) =>
+{
+    var quadro = await ctx.Quadros.FindAsync(id);
+    if (quadro == null) return Results.NotFound("Quadro não encontrado.");
+
+    quadro.TituloQuadro = quadroAtualizado.TituloQuadro ?? quadro.TituloQuadro;
+
+    await ctx.SaveChangesAsync();
+    return Results.Ok("Quadro atualizado com sucesso.");
+});
+
+
+app.MapDelete("/api/quadro/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+{
+    var quadro = await ctx.Quadros.FindAsync(id);
+    if (quadro == null) return Results.NotFound("Quadro não encontrado.");
+
+    ctx.Quadros.Remove(quadro);
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok("Quadro deletado com sucesso.");
+});
 
 
 app.Run();
