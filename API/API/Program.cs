@@ -116,5 +116,47 @@ app.MapPost("/api/tarefa/criar", async ([FromBody] Tarefas tarefa, [FromServices
 
 });
 
+app.MapPut("/api/tarefa/atualizar/{id}", async (int id, [FromBody] Tarefas tarefaAtualizada, [FromServices] AppDataContext ctx) =>
+{
+    // Buscar a tarefa pelo Id no banco de dados
+    var tarefa = await ctx.Tarefas.FindAsync(id);
+    
+    if (tarefa == null)
+    {
+        return Results.NotFound("Tarefa não encontrada.");
+    }
+
+    // Atualizar os campos da tarefa, se fornecidos
+    tarefa.TituloTarefa = tarefaAtualizada.TituloTarefa ?? tarefa.TituloTarefa;
+    tarefa.DescricaoTarefa = tarefaAtualizada.DescricaoTarefa ?? tarefa.DescricaoTarefa;
+    
+
+    // Salvar as mudanças no banco de dados
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok("Tarefa atualizada com sucesso.");
+});
+
+
+app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+{
+    // Buscar a tarefa pelo Id no banco de dados
+    var tarefa = await ctx.Tarefas.FindAsync(id);
+    
+    if (tarefa == null)
+    {
+        return Results.NotFound("Tarefa não encontrada.");
+    }
+
+    // Remover a tarefa do contexto
+    ctx.Tarefas.Remove(tarefa);
+
+    // Salvar as mudanças no banco de dados
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok("Tarefa deletada com sucesso.");
+});
+
+
 
 app.Run();
