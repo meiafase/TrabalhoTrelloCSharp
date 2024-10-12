@@ -66,6 +66,12 @@ app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices
 
 });
 
+app.MapGet("/api/quadro/listar/{id}", async (int id, [FromServices] AppDataContext ctx) => {
+    var quadros = await ctx.Quadros.Where(q => q.IdUsuario == id).ToListAsync();
+
+    return Results.Ok(quadros);
+});
+
 
 app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadroAtualizado, [FromServices] AppDataContext ctx) =>
 {
@@ -75,7 +81,7 @@ app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadr
     quadro.TituloQuadro = quadroAtualizado.TituloQuadro ?? quadro.TituloQuadro;
 
     await ctx.SaveChangesAsync();
-    return Results.Ok("Quadro atualizado com sucesso.");
+    return Results.Ok(quadro);
 });
 
 
@@ -98,7 +104,6 @@ app.MapPost("/api/tarefa/criar", async ([FromBody] Tarefas tarefa, [FromServices
         return Results.BadRequest("Título e Descrição são obrigatórios.");
     }
 
-    // Certificar-se de que o Id do quadro existe no banco de dados
     var quadro = await ctx.Quadros.FindAsync(tarefa.IdQuadro);
     if (quadro == null)
     {
@@ -157,6 +162,50 @@ app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataC
     return Results.Ok("Tarefa deletada com sucesso.");
 });
 
+
+app.MapPost("/api/comentario/cadastrar", async ([FromBody] Comentarios comentario, [FromServices] AppDataContext ctx) =>
+{
+     // Verificar se o usuário existe
+    var usuario = await ctx.Usuarios.FindAsync(comentario.IdUsuario);
+    if (usuario == null)
+    {
+        return Results.BadRequest("Usuário não encontrado.");
+    }
+
+    // Verificar se a tarefa existe
+    var tarefa = await ctx.Tarefas.FindAsync(comentario.IdTarefa);
+    if (tarefa == null)
+    {
+        return Results.BadRequest("Tarefa não encontrada.");
+    }
+
+    // Adicionar o comentário e salvar no banco
+    ctx.Comentarios.Add(comentario);
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok("Comentário criado com sucesso.");
+});
+
+app.MapDelete("/api/comentario/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+{
+    var comentario = await ctx.Comentarios.FindAsync(id);
+    
+    if (comentario == null)
+    {
+        return Results.NotFound("Comentário não encontrado.");
+    }
+
+    ctx.Comentarios.Remove(comentario);
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok("Comentário deletado com sucesso.");
+});
+
+app.MapGet("/api/comentario/listar/{id}", async (int id, [FromServices] AppDataContext ctx) => {
+    var comentario = await ctx.Comentarios.Where(q => q.IdTarefa == id).ToListAsync();
+
+    return Results.Ok(comentario);
+});
 
 
 app.Run();
