@@ -1,9 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import './Index.css'
 
 import Button from '@mui/material/Button';
 
 const Home = () => {
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const pegarSessao = () => {
+            let user = localStorage.getItem("user");
+            if (user === null) {
+                navigate("/Login");
+            }
+        }
+
+        pegarSessao();
+    }, [navigate])
+
     return (
         <div className="global">
             <div className="content">

@@ -3,10 +3,26 @@ using API.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // URL do seu frontend React
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddDbContext<AppDataContext>();
 
+
 var app = builder.Build();
+
+app.UseCors("AllowReactApp");
+
+app.MapControllers();
 
 app.MapPost("/api/usuario/cadastrar", async ([FromBody] Usuarios usuario, [FromServices] AppDataContext ctx) =>
 {
@@ -48,7 +64,7 @@ app.MapPost("/api/usuario/login", async ([FromBody] Usuarios login, [FromService
         return Results.Ok("Senha incorreta.");
     }
 
-    return Results.Ok("Login realizado com sucesso.");
+    return Results.Ok(usuario);
 });
 
 
