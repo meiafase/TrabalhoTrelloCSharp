@@ -67,15 +67,8 @@ body {
 }
 
 .boardAfazer {
-    background-color: #A04747;
-}
-
-.boardFazendo {
-    background-color: #EEDF7A;
-}
-
-.boardFeito {
-    background-color: #387F39;
+    background-color: black;
+    margin-left: 2px;
 }
 
 .card {

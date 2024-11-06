@@ -3,8 +3,8 @@ using API.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddControllers();
 
+builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -14,15 +14,14 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod(); 
     });
 });
-
 builder.Services.AddDbContext<AppDataContext>();
-
 
 var app = builder.Build();
 
 app.UseCors("AllowReactApp");
-
 app.MapControllers();
+
+
 
 app.MapPost("/api/usuario/cadastrar", async ([FromBody] Usuarios usuario, [FromServices] AppDataContext ctx) =>
 {
@@ -43,7 +42,6 @@ app.MapPost("/api/usuario/cadastrar", async ([FromBody] Usuarios usuario, [FromS
 
     return Results.Created($"/api/usuario/{usuario.IdUsuario}", usuario);
 });
-
 
 app.MapPost("/api/usuario/login", async ([FromBody] Usuarios login, [FromServices] AppDataContext ctx) =>
 {
@@ -67,7 +65,6 @@ app.MapPost("/api/usuario/login", async ([FromBody] Usuarios login, [FromService
     return Results.Ok(usuario);
 });
 
-
 app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices] AppDataContext ctx) =>
 {
     if (string.IsNullOrEmpty(quadro.TituloQuadro))
@@ -88,7 +85,6 @@ app.MapGet("/api/quadro/listar/{id}", async (int id, [FromServices] AppDataConte
     return Results.Ok(quadros);
 });
 
-
 app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadroAtualizado, [FromServices] AppDataContext ctx) =>
 {
     var quadro = await ctx.Quadros.FindAsync(id);
@@ -99,7 +95,6 @@ app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadr
     await ctx.SaveChangesAsync();
     return Results.Ok(quadro);
 });
-
 
 app.MapDelete("/api/quadro/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
 {
@@ -158,7 +153,6 @@ app.MapPut("/api/tarefa/atualizar/{id}", async (int id, [FromBody] Tarefas taref
     return Results.Ok("Tarefa atualizada com sucesso.");
 });
 
-
 app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
 {
     // Buscar a tarefa pelo Id no banco de dados
@@ -177,7 +171,6 @@ app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataC
 
     return Results.Ok("Tarefa deletada com sucesso.");
 });
-
 
 app.MapPost("/api/comentario/cadastrar", async ([FromBody] Comentarios comentario, [FromServices] AppDataContext ctx) =>
 {
