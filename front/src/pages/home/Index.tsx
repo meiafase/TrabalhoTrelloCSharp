@@ -7,7 +7,8 @@ import Button from '@mui/material/Button';
 const Home = () => {
 
     const navigate = useNavigate();
-
+    
+    
     useEffect(() => {
         const pegarSessao = () => {
             let user = localStorage.getItem("user");
@@ -15,9 +16,15 @@ const Home = () => {
                 navigate("/Login");
             }
         }
-
+        
         pegarSessao();
     }, [navigate])
+    
+    
+    const logout = () => {
+        localStorage.removeItem("user");
+        navigate("/Login")
+    }
 
     return (
         <div className="global">
@@ -29,7 +36,7 @@ const Home = () => {
                 <div className="addTarefa">
                     <p>Você pode arrastar as tarefas entre os Quadros</p>
                     <Button variant="contained" color="success" size="small">Adicionar Tarefa</Button>
-                    <Button variant="contained" color="error" size="small">Logout</Button>
+                    <Button variant="contained" color="error" size="small" onClick={logout}>Logout</Button>
                 </div>
 
                 <div className="boards">
