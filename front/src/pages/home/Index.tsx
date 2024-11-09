@@ -42,7 +42,7 @@ const Home: React.FC = () => {
 
     useEffect(() => {
         const pegarQuadros = async () => {
-            await Axios.get(`http://localhost:5129/api/quadro/listar/2`, {
+            await Axios.get(`http://localhost:5129/api/quadro/listar/${idusuario}`, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                 }

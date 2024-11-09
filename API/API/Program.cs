@@ -65,6 +65,15 @@ app.MapPost("/api/usuario/login", async ([FromBody] Usuarios login, [FromService
     return Results.Ok(usuario);
 });
 
+
+// Listar usuário por ID
+app.MapGet("/api/usuario/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+{
+    var usuario = await ctx.Usuarios.FindAsync(id);
+    return usuario == null ? Results.NotFound("Usuário não encontrado.") : Results.Ok(usuario);
+});
+
+// Criar quadro, limitando a criação a 4 quadros por usuário
 app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices] AppDataContext ctx) =>
 {
     if (string.IsNullOrEmpty(quadro.TituloQuadro))
@@ -72,11 +81,17 @@ app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices
         return Results.BadRequest("Titulo do quadro é obrigatório.");
     }
 
+    // Verificar se o usuário já tem 4 quadros
+    var quadrosExistentes = await ctx.Quadros.Where(q => q.IdUsuario == quadro.IdUsuario).ToListAsync();
+    if (quadrosExistentes.Count >= 4)
+    {
+        return Results.BadRequest("O usuário já possui o máximo de 4 quadros.");
+    }
+
     ctx.Quadros.Add(quadro);
     await ctx.SaveChangesAsync();
 
     return Results.Created($"/api/quadro/{quadro.IdQuadro}", quadro);
-
 });
 
 app.MapGet("/api/quadro/listar/{id}", async (int id, [FromServices] AppDataContext ctx) => {
@@ -170,6 +185,22 @@ app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataC
     await ctx.SaveChangesAsync();
 
     return Results.Ok("Tarefa deletada com sucesso.");
+});
+
+
+
+// Listar todas as tarefas por ID do usuário
+app.MapGet("/api/tarefa/listar/{idUsuario}", async (int idUsuario, [FromServices] AppDataContext ctx) =>
+{
+    var tarefas = await ctx.Tarefas.Where(t => t.IdUsuario == idUsuario).ToListAsync();
+    return Results.Ok(tarefas);
+});
+
+// Verificar quantidade de quadros do usuário
+app.MapGet("/api/quadro/quantidade/{idUsuario}", async (int idUsuario, [FromServices] AppDataContext ctx) =>
+{
+    var quantidadeQuadros = await ctx.Quadros.CountAsync(q => q.IdUsuario == idUsuario);
+    return Results.Ok(new { Quantidade = quantidadeQuadros });
 });
 
 app.MapPost("/api/comentario/cadastrar", async ([FromBody] Comentarios comentario, [FromServices] AppDataContext ctx) =>
