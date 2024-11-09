@@ -50,6 +50,7 @@ body {
     display: flex;
     justify-content: space-around;
     overflow-y: auto;
+    color: white;
 }
 
 .board {

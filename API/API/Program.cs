@@ -67,7 +67,7 @@ app.MapPost("/api/usuario/login", async ([FromBody] Usuarios login, [FromService
 
 
 // Listar usuário por ID
-app.MapGet("/api/usuario/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+app.MapGet("/api/usuario/buscar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
 {
     var usuario = await ctx.Usuarios.FindAsync(id);
     return usuario == null ? Results.NotFound("Usuário não encontrado.") : Results.Ok(usuario);
@@ -85,7 +85,7 @@ app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices
     var quadrosExistentes = await ctx.Quadros.Where(q => q.IdUsuario == quadro.IdUsuario).ToListAsync();
     if (quadrosExistentes.Count >= 4)
     {
-        return Results.BadRequest("O usuário já possui o máximo de 4 quadros.");
+        return Results.Ok("O usuário já possui o máximo de 4 quadros.");
     }
 
     ctx.Quadros.Add(quadro);
@@ -186,8 +186,6 @@ app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataC
 
     return Results.Ok("Tarefa deletada com sucesso.");
 });
-
-
 
 // Listar todas as tarefas por ID do usuário
 app.MapGet("/api/tarefa/listar/{idUsuario}", async (int idUsuario, [FromServices] AppDataContext ctx) =>

@@ -11,47 +11,82 @@ import CardActionArea from '@mui/material/CardActionArea';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
-import { Button, Typography, Divider } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 
 
 type Quadro = {
     tituloQuadro: string;
     idQuadro: number;
+};
+
+type Tarefa = {
+    tituloTarefa: string;
+    idQuadro: number;
+    descricaoTarefa : string;
     idTarefa: number;
+};
+
+type Usuario = {
+    nomeUsuario: string;
 };
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
 
-    const [idusuario, setIdusuario] = useState<string>("");
+    const [idUsuario, setIdusuario] = useState<number>();
     const [quadros, setQuadros] = useState<Quadro[]>([]);
+    const [tarefas, setTarefas] = useState<Tarefa[]>([]);
+    const [usuario, setUsuario] = useState<Usuario | null>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
-    const [idTarefa, setIdTarefa] = useState<string | undefined>(undefined);
+    const [idTarefa, setIdTarefa] = useState<number | undefined>(undefined);
 
     useEffect(() => {
-        const pegarSessao = () => {
-            let user = localStorage.getItem("user");
+        const pegarSessao = async () => {
+            const user = localStorage.getItem("user");
+    
+            // Verifica se o usuário está logado
             if (user === null) {
                 navigate("/Login");
-            } else {
-                setIdusuario(user);
+                return;
+            }
+    
+            // Define o ID do usuário e só então faz a chamada da API
+            setIdusuario(Number(user));
+    
+            // Só faz a requisição quando idusuario estiver disponível
+            if (user) {
+                try {
+                    const responseUsuario = await Axios.get(`http://localhost:5129/api/usuario/buscar/${idUsuario}`, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                        }
+                    });
+                    setUsuario(responseUsuario.data);
+
+                    const responseQuadros = await Axios.get(`http://localhost:5129/api/quadro/listar/${idUsuario}`, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                        }
+                    });
+                    setQuadros(responseQuadros.data);
+
+                    const responseTarefas = await Axios.get(`http://localhost:5129/api/tarefa/listar/${idUsuario}`, {
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                        }
+                    });
+                    setTarefas(responseTarefas.data);
+                    console.log(responseTarefas.data)
+                } catch (error) {
+                    console.error("Erro:", error);
+                }
             }
         };
+    
         pegarSessao();
-    }, [navigate]);
+    }, [navigate, idUsuario]);
 
-    useEffect(() => {
-        const pegarQuadros = async () => {
-            await Axios.get(`http://localhost:5129/api/quadro/listar/${idusuario}`, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                }
-            }).then(response => {
-                setQuadros(response.data);
-            });
-        };
-        pegarQuadros();
-    }, [navigate, idusuario]);
+
 
     const logout = () => {
         localStorage.removeItem("user");
@@ -62,7 +97,7 @@ const Home: React.FC = () => {
         <div className="global">
             <div className="content">
                 <div className="title">
-                    <h1>Board do Samuel</h1>
+                    <h1>Board do {usuario?.nomeUsuario}</h1>
                 </div>
 
                 <div className="addTarefa">
@@ -88,29 +123,32 @@ const Home: React.FC = () => {
                                         </IconButton>
                                     </div>
                                 </div>
-                                <div className="card" draggable="true">
-                                    <Card sx={{ width: "100%", marginBottom: "10px" }} onClick={() => { 
-                                        setIdTarefa(String(quadro.idTarefa)); 
-                                        setOpenModal(true); 
-                                    }}>
-                                        <CardActionArea>
-                                            <CardContent>
-                                                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                                    <Typography gutterBottom variant="h5" component="div">
-                                                        Tarefa
-                                                    </Typography>
-                                                    <Typography gutterBottom variant="inherit" component="div">
-                                                        Entrega: 01/11 às 16:24
-                                                    </Typography>
-                                                </div>
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                                    Lizards are a widespread group of squamate reptiles, with over 6,000
-                                                    species, ranging across all continents except Antarctica
-                                                </Typography>
-                                            </CardContent>
-                                        </CardActionArea>
-                                    </Card>
-                                </div>
+                                {tarefas.map((tarefa) => (
+                                    Number(tarefa.idQuadro) === Number(quadro.idQuadro) ? (
+                                        <div className="card" draggable="true">
+                                            <Card sx={{ width: "100%", marginBottom: "10px" }} onClick={() => { 
+                                                setIdTarefa(Number(tarefa.idTarefa)); 
+                                                setOpenModal(true); 
+                                            }}>
+                                                <CardActionArea>
+                                                    <CardContent>
+                                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                                            <Typography gutterBottom variant="h5" component="div">
+                                                                {tarefa.tituloTarefa}
+                                                            </Typography>
+                                                            <Typography gutterBottom variant="inherit" component="div">
+                                                                Entrega: 01/11 às 16:24
+                                                            </Typography>
+                                                        </div>
+                                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                            {tarefa.descricaoTarefa}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </CardActionArea>
+                                            </Card>
+                                        </div>
+                                    ) : ("")
+                                ))}
                             </div>
                         ))
                     ) : (

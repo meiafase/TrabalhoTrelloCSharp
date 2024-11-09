@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Axios from 'axios';
+
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, Typography, Divider } from "@mui/material";
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,14 +12,34 @@ import PersonIcon from '@mui/icons-material/Person';
 interface ModalTarefaProps {
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-  idTarefa: string | undefined;
+  idTarefa: number | undefined;
 }
 
 const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTarefa }) => {
+
+    const [comentarios, setComentarios] = useState([]);
+
+    useEffect(() => {
+
+        if (idTarefa) {
+            const PegarComentarios = async () => {
+                const responseComentarios = await Axios.get(`http://localhost:5129/api/usuario/buscar/${idTarefa}`, {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                    }
+                });
+                console.log(responseComentarios.data)
+                setComentarios(responseComentarios.data);
+            }
+    
+            PegarComentarios();
+        }
+    }, [idTarefa])
+
     return (
         <Dialog open={openModal} onClose={() => setOpenModal(false)}>
             <div style={{width: "100%", display: "flex", justifyContent: "space-between"}}>
-                <DialogTitle>Tarefa Details</DialogTitle>
+                <DialogTitle>Tarefa Details {idTarefa}</DialogTitle>
                 <DialogTitle variant="inherit">Prazo: 11/12 17:30</DialogTitle>
             </div>
             <Divider />
