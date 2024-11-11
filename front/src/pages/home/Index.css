@@ -75,9 +75,51 @@ body {
 .card {
     width: 100%;
     margin-top: 10px;
-    cursor: move;
+     cursor: grab;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
 }
 
+
 .card.drag {
-    opacity: 0.5;
+    opacity: 0.8;
+    border: 2px solid red;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: scale(1.05);
+    cursor: grabbing;
+    transition: all 0.3s ease;
+}
+
+.card.drag:before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 1px solid rgba(52, 152, 219, 0.5);
+    border-radius: 8px;
+    z-index: -1;
+    animation: pulseBorder 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseBorder {
+    0% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
 }

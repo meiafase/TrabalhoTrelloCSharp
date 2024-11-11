@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Axios from 'axios';
 import ModalTarefa from "../components/ModalTarefa";
+import DragAndDrop from './js.js';
 
-import './Index.css'
+import './Index.css';
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -13,7 +14,6 @@ import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import { Button, Typography } from "@mui/material";
 
-
 type Quadro = {
     tituloQuadro: string;
     idQuadro: number;
@@ -22,7 +22,7 @@ type Quadro = {
 type Tarefa = {
     tituloTarefa: string;
     idQuadro: number;
-    descricaoTarefa : string;
+    descricaoTarefa: string;
     idTarefa: number;
 };
 
@@ -30,7 +30,7 @@ type Usuario = {
     nomeUsuario: string;
 };
 
-const Home: React.FC = () => {
+const Home = () => {
     const navigate = useNavigate();
 
     const [idUsuario, setIdusuario] = useState<number>();
@@ -41,19 +41,21 @@ const Home: React.FC = () => {
     const [idTarefa, setIdTarefa] = useState<number | undefined>(undefined);
 
     useEffect(() => {
+        DragAndDrop();
+    })
+
+    useEffect(() => {
+
         const pegarSessao = async () => {
             const user = localStorage.getItem("user");
-    
-            // Verifica se o usuário está logado
+
             if (user === null) {
                 navigate("/Login");
                 return;
             }
-    
-            // Define o ID do usuário e só então faz a chamada da API
+
             setIdusuario(Number(user));
-    
-            // Só faz a requisição quando idusuario estiver disponível
+
             if (user) {
                 try {
                     const responseUsuario = await Axios.get(`http://localhost:5129/api/usuario/buscar/${idUsuario}`, {
@@ -82,11 +84,9 @@ const Home: React.FC = () => {
                 }
             }
         };
-    
+
         pegarSessao();
-    }, [navigate, idUsuario]);
-
-
+    }, [idUsuario]);
 
     const logout = () => {
         localStorage.removeItem("user");
@@ -113,31 +113,28 @@ const Home: React.FC = () => {
                             <div key={index} id={String(quadro.idQuadro)} className="board boardAfazer">
                                 <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                                     <h3>{quadro.tituloQuadro}</h3>
-                                    <div style={{display: "flex", justifyContent: "space-between" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
                                         <IconButton aria-label="deletar" sx={{ color: "red" }}>
                                             <DeleteIcon />
                                         </IconButton>
-                                        <hr style={{height: "50%", marginTop: "15px"}} />
-                                        <IconButton aria-label="editar" sx={{color: "orange"}}>
+                                        <hr style={{ height: "50%", marginTop: "15px" }} />
+                                        <IconButton aria-label="editar" sx={{ color: "orange" }}>
                                             <EditIcon />
                                         </IconButton>
                                     </div>
                                 </div>
                                 {tarefas.map((tarefa) => (
                                     Number(tarefa.idQuadro) === Number(quadro.idQuadro) ? (
-                                        <div className="card" draggable="true">
-                                            <Card sx={{ width: "100%", marginBottom: "10px" }} onClick={() => { 
-                                                setIdTarefa(Number(tarefa.idTarefa)); 
-                                                setOpenModal(true); 
+                                        <div className="card" draggable="true" id={`card_${tarefa.idTarefa}`}>
+                                            <Card sx={{ width: "100%", marginBottom: "10px" }} onClick={() => {
+                                                setIdTarefa(Number(tarefa.idTarefa));
+                                                setOpenModal(true);
                                             }}>
                                                 <CardActionArea>
                                                     <CardContent>
                                                         <div style={{ display: "flex", justifyContent: "space-between" }}>
                                                             <Typography gutterBottom variant="h5" component="div">
                                                                 {tarefa.tituloTarefa}
-                                                            </Typography>
-                                                            <Typography gutterBottom variant="inherit" component="div">
-                                                                Entrega: 01/11 às 16:24
                                                             </Typography>
                                                         </div>
                                                         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
