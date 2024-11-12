@@ -13,6 +13,9 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Snackbar, { SnackbarCloseReason }  from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
+import { DatePicker } from 'rsuite';
+import 'rsuite/DatePicker/styles/index.css';
+
 import '../login/Index.css';
 
 
@@ -31,6 +34,7 @@ const AdicionarTarefa = () => {
     const [descricaoTarefa, setDescricaoTarefa] = useState<string | undefined>(undefined);
     const [quadro, setQuadro] = useState<string | undefined>(undefined);
     const [quadros, setQuadros] = useState<Quadro[]>([]);
+    const [dataEntrega, setDataEntrega] = useState<Date | null>(null);
     const [displayErro, setDisplayErro] = useState(false);
     const [msgErro, setMsgErro] = useState("");
 
@@ -79,8 +83,23 @@ const AdicionarTarefa = () => {
         setDisplayErro(false);
       };
 
+        const handleDateChange = (date: Date | null) => {
+            setDataEntrega(date);
+        };
+
     const handleSubmit = async () => {
-        if (tituloTarefa !== undefined && descricaoTarefa !== undefined && quadro !== undefined) {
+        if (tituloTarefa !== undefined && descricaoTarefa !== undefined && quadro !== undefined && dataEntrega !== null) {
+            const dataEntregaTarefa = new Date(dataEntrega)
+            dataEntregaTarefa.toLocaleString('pt-BR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            });
+            console.log(dataEntrega, dataEntregaTarefa)
             const responseTarefa = await Axios.post(`http://localhost:5129/api/tarefa/criar`, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -88,11 +107,10 @@ const AdicionarTarefa = () => {
                 "idUsuario": idUsuario, 
                 "tituloTarefa": tituloTarefa,
                 "descricaoTarefa": descricaoTarefa,
-                "dataEntregaTarefa": null,
+                "dataEntregaTarefa": dataEntregaTarefa,
                 "idQuadro": quadro
             });
 
-            console.log(responseTarefa)
 
             if (responseTarefa.status === 201) {
                 navigate('../')
@@ -148,6 +166,10 @@ const AdicionarTarefa = () => {
                                 ))}
                             </Select>
                         </FormControl>
+                    </div>
+                    <div className="input">
+                        <label>Entregar em:</label>
+                        <DatePicker format="dd-MM-yyyy HH:mm:ss" style={{width: "100%"}} onChange={handleDateChange} editable={false} />
                     </div>
                 </div>
                 <div className="btn">

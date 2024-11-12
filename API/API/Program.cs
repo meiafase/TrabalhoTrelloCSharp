@@ -124,7 +124,6 @@ app.MapDelete("/api/quadro/deletar/{id}", async (int id, [FromServices] AppDataC
 
 app.MapPost("/api/tarefa/criar", async ([FromBody] Tarefas tarefa, [FromServices] AppDataContext ctx) =>
 {
-    // Validação para verificar se o título e a descrição foram fornecidos
     if (string.IsNullOrEmpty(tarefa.TituloTarefa) || string.IsNullOrEmpty(tarefa.DescricaoTarefa))
     {
         return Results.BadRequest("Título e Descrição são obrigatórios.");
@@ -136,16 +135,21 @@ app.MapPost("/api/tarefa/criar", async ([FromBody] Tarefas tarefa, [FromServices
         return Results.BadRequest("Quadro não encontrado.");
     }
 
-    // Adicionar a nova tarefa ao contexto
+    // Converter a data para o horário de Brasília (UTC-3)
+    if (tarefa.DataEntregaTarefa.HasValue)
+    {
+        var brasiliaTimeZone = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time");
+        tarefa.DataEntregaTarefa = TimeZoneInfo.ConvertTime(tarefa.DataEntregaTarefa.Value, brasiliaTimeZone);
+    }
+
     ctx.Tarefas.Add(tarefa);
 
-    // Salvar as alterações no banco de dados
     await ctx.SaveChangesAsync();
 
-    // Retornar o status 201 Created com a URI da nova tarefa
     return Results.Created($"/api/tarefa/{tarefa.IdTarefa}", tarefa);
-
 });
+
+
 
 app.MapPut("/api/tarefa/atualizar/{id}", async (int id, [FromBody] Tarefas tarefaAtualizada, [FromServices] AppDataContext ctx) =>
 {
@@ -187,13 +191,11 @@ app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataC
     return Results.Ok("Tarefa deletada com sucesso.");
 });
 
-<<<<<<< Updated upstream
-=======
-//nova rota com id de tarefa 
-app.MapGet("/api/tarefa/{idTarefa}", async (int idTarefa, [FromServices] AppDataContext ctx) =>
+
+app.MapGet("/api/tarefa/buscar/{idTarefa}", async (int idTarefa, [FromServices] AppDataContext ctx) =>
 {
     var tarefa = await ctx.Tarefas.FindAsync(idTarefa);
-    
+
     if (tarefa == null)
     {
         return Results.NotFound("Tarefa não encontrada.");
@@ -202,7 +204,6 @@ app.MapGet("/api/tarefa/{idTarefa}", async (int idTarefa, [FromServices] AppData
     return Results.Ok(tarefa);
 });
 
->>>>>>> Stashed changes
 // Listar todas as tarefas por ID do usuário
 app.MapGet("/api/tarefa/listar/{idUsuario}", async (int idUsuario, [FromServices] AppDataContext ctx) =>
 {
@@ -255,10 +256,23 @@ app.MapDelete("/api/comentario/deletar/{id}", async (int id, [FromServices] AppD
     return Results.Ok("Comentário deletado com sucesso.");
 });
 
-app.MapGet("/api/comentario/listar/{id}", async (int id, [FromServices] AppDataContext ctx) => {
-    var comentario = await ctx.Comentarios.Where(q => q.IdTarefa == id).ToListAsync();
+app.MapGet("/api/comentario/listar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+{
+    var comentariosComUsuarios = await ctx.Comentarios
+        .Where(q => q.IdTarefa == id)
+        .Include(c => c.Usuario)
+        .ToListAsync();
 
-    return Results.Ok(comentario);
+    var resultado = comentariosComUsuarios.Select(c => new
+    {
+        c.IdComentario,
+        c.IdTarefa,
+        c.Comentario,
+        c.CriadoEm,
+        UsuarioNome = c.Usuario?.NomeUsuario
+    });
+
+    return Results.Ok(resultado);
 });
 
 

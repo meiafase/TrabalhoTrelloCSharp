@@ -20,9 +20,9 @@ public class Tarefas
     
     public string? TituloTarefa { get; set; }
     public string? DescricaoTarefa { get; set; }
-    
-    public DateTime? DataEntregaTarefa { get; set; }
-    
+
+    public DateTimeOffset? DataEntregaTarefa { get; set; }
+
     public DateTime CriadoEm { get; set; } = DateTime.Now;
 
     [JsonIgnore] 

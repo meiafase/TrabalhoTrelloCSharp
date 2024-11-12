@@ -45,7 +45,6 @@ const Home = () => {
     })
 
     useEffect(() => {
-
         const pegarSessao = async () => {
             const user = localStorage.getItem("user");
 
