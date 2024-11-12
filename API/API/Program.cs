@@ -187,6 +187,22 @@ app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataC
     return Results.Ok("Tarefa deletada com sucesso.");
 });
 
+<<<<<<< Updated upstream
+=======
+//nova rota com id de tarefa 
+app.MapGet("/api/tarefa/{idTarefa}", async (int idTarefa, [FromServices] AppDataContext ctx) =>
+{
+    var tarefa = await ctx.Tarefas.FindAsync(idTarefa);
+    
+    if (tarefa == null)
+    {
+        return Results.NotFound("Tarefa não encontrada.");
+    }
+
+    return Results.Ok(tarefa);
+});
+
+>>>>>>> Stashed changes
 // Listar todas as tarefas por ID do usuário
 app.MapGet("/api/tarefa/listar/{idUsuario}", async (int idUsuario, [FromServices] AppDataContext ctx) =>
 {
