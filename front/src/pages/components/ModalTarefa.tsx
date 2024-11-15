@@ -170,7 +170,7 @@ const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTa
             </DialogContent>
 
             <DialogActions>
-                <Button variant="contained" size="small" color="primary">
+                <Button variant="contained" size="small" onClick={()=> navigate(`/EditarTarefa/${idTarefa}`) } color="primary">
                     Editar Tarefa
                 </Button>
                 <Button variant="contained" size="small" color="error">
