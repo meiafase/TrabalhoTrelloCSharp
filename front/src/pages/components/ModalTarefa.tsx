@@ -14,6 +14,7 @@ import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SendIcon from '@mui/icons-material/Send';
+import DialogContentText from '@mui/material/DialogContentText';
 
 
 interface ModalTarefaProps {
@@ -58,8 +59,8 @@ const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTa
 
     const AdicionarComentario = async () => {
 
-        if (comentario !== null) {
-            const responseComentario = await Axios.post(`http://localhost:5129/api/comentario/cadastrar`, {
+        if (comentario !== null && comentario !== "") {
+            await Axios.post(`http://localhost:5129/api/comentario/cadastrar`, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                 },
@@ -100,9 +101,27 @@ const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTa
     
             PegarComentarios();
         }
-    }, [idTarefa, AdicionarComentario])
+    }, [idTarefa, comentario])
 
+    const [open, setOpen] = React.useState(false);
 
+    const handleClickOpen = () => {
+      setOpen(true);
+    };
+  
+    const handleClose = () => {
+      setOpen(false);
+    };
+
+    const handleDelete = async () => {
+        await Axios.delete(`http://localhost:5129/api/tarefa/deletar/${idTarefa}`, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            }
+        });
+        handleClose();
+        setOpenModal(false)
+    }
     
 
     return (
@@ -173,7 +192,7 @@ const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTa
                 <Button variant="contained" size="small" onClick={()=> navigate(`/EditarTarefa/${idTarefa}`) } color="primary">
                     Editar Tarefa
                 </Button>
-                <Button variant="contained" size="small" color="error">
+                <Button variant="contained" size="small" onClick={handleClickOpen} color="error">
                     Excluir Tarefa
                 </Button>
             </DialogActions>
@@ -182,7 +201,31 @@ const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTa
             <Button variant="contained" size="small" onClick={() => setOpenModal(false)} color="success">
                 Fechar
             </Button>
+            <React.Fragment>
+                <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">
+                    {"Tem certeza de que deseja excluir esta tarefa?"}
+                    </DialogTitle>
+                    <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Ao confirmar a exclusão, todos os dados associados a esta tarefa serão permanentemente removidos. Isso inclui qualquer progresso registrado, informações detalhadas ou comentários vinculados.
+
+                        Você deseja continuar com a exclusão?
+                    </DialogContentText>
+                    </DialogContent> 
+                    <DialogActions>
+                    <Button onClick={handleClose} color="error" variant="contained" size="small">Não</Button>
+                    <Button onClick={handleDelete} color="success" variant="contained" size="small">Sim</Button>
+                    </DialogActions>
+                </Dialog>
+                </React.Fragment>
         </Dialog>
+        
     );
 };
 

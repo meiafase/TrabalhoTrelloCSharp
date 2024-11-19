@@ -85,7 +85,7 @@ const Home = () => {
         };
 
         pegarSessao();
-    }, [idUsuario]);
+    }, [idUsuario, navigate, openModal]);
 
     const logout = () => {
         localStorage.removeItem("user");

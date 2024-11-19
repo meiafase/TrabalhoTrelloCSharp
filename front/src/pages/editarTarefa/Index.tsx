@@ -11,6 +11,8 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Snackbar, { SnackbarCloseReason }  from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 import { DatePicker } from 'rsuite';
 import 'rsuite/DatePicker/styles/index.css';
@@ -41,6 +43,8 @@ const EditarTarefa = () => {
     const [usuario, setUsuario] = useState<string | undefined>(undefined);
     const [quadros, setQuadros] = useState<Quadro[]>([]);
     const [quadro, setQuadro] = useState<string | undefined>(undefined);
+    const [displayErro, setDisplayErro] = useState(false);
+    const [msgErro, setMsgErro] = useState("");
 
     useEffect(()=>{
 
@@ -105,6 +109,17 @@ const EditarTarefa = () => {
         setQuadro(event.target.value);
     };
 
+    const handleClose = (
+        event?: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason,
+      ) => {
+        if (reason === 'clickaway') {
+          return;
+        }
+    
+        setDisplayErro(false);
+      };
+
     const handleAtualizar = async () => {
         console.log(quadro)
         if (tituloTarefa !== "" && DescricaoTarefa !== "" && dataEntrega !== null && usuario !== undefined && quadro !== undefined) {
@@ -131,16 +146,26 @@ const EditarTarefa = () => {
             });
 
             if (responseTarefa.status === 200) {
-                navigate('../')
+                navigate('../');
             }
         } else {
-            alert("erro")
+            setMsgErro("Todos os campos precisam ser preenchidos");
+            setDisplayErro(true)
         }
     }
 
     return (
         <div className="loginContent">
-     
+            <Snackbar open={displayErro} autoHideDuration={5000} onClose={handleClose}>
+                <Alert
+                onClose={handleClose}
+                severity="error"
+                variant="filled"
+                sx={{ width: '100%' }}
+                >
+                {msgErro}
+                </Alert>
+            </Snackbar>
             <Paper className="login">
                 <h1>Editar Tarefa</h1>
                 <hr />
