@@ -73,6 +73,13 @@ app.MapGet("/api/usuario/buscar/{id}", async (int id, [FromServices] AppDataCont
     return usuario == null ? Results.NotFound("Usuário não encontrado.") : Results.Ok(usuario);
 });
 
+// Listar usuário
+app.MapGet("/api/usuario/listar", async ([FromServices] AppDataContext ctx) =>
+{
+    var usuarios = await ctx.Usuarios.ToListAsync();
+    return Results.Ok(usuarios);
+});
+
 // Criar quadro, limitando a criação a 4 quadros por usuário
 app.MapPost("/api/quadro/criar", async ([FromBody] Quadros quadro, [FromServices] AppDataContext ctx) =>
 {
@@ -164,6 +171,9 @@ app.MapPut("/api/tarefa/atualizar/{id}", async (int id, [FromBody] Tarefas taref
     // Atualizar os campos da tarefa, se fornecidos
     tarefa.TituloTarefa = tarefaAtualizada.TituloTarefa ?? tarefa.TituloTarefa;
     tarefa.DescricaoTarefa = tarefaAtualizada.DescricaoTarefa ?? tarefa.DescricaoTarefa;
+    tarefa.IdUsuario = tarefaAtualizada.IdUsuario ?? tarefa.IdUsuario;
+    tarefa.IdQuadro = tarefaAtualizada.IdQuadro ?? tarefa.IdQuadro;
+    tarefa.DataEntregaTarefa = tarefaAtualizada.DataEntregaTarefa ?? tarefa.DataEntregaTarefa;
     
 
     // Salvar as mudanças no banco de dados
