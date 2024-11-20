@@ -118,15 +118,28 @@ app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadr
     return Results.Ok(quadro);
 });
 
-app.MapDelete("/api/quadro/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
+app.MapDelete("/api/quadro/deletar/{idQuadro}", async (int idQuadro, [FromServices] AppDataContext ctx) =>
 {
-    var quadro = await ctx.Quadros.FindAsync(id);
-    if (quadro == null) return Results.NotFound("Quadro não encontrado.");
+    var quadro = await ctx.Quadros.FindAsync(idQuadro);
+    if (quadro == null)
+    {
+        return Results.NotFound("Quadro não encontrado.");
+    }
+
+    var tarefasAssociadas = await ctx.Tarefas.Where(t => t.IdQuadro == idQuadro).ToListAsync();
+
+    if (tarefasAssociadas.Any())
+    {
+        foreach (var tarefa in tarefasAssociadas)
+        {
+            ctx.Tarefas.Remove(tarefa);
+        }
+    }
 
     ctx.Quadros.Remove(quadro);
     await ctx.SaveChangesAsync();
 
-    return Results.Ok("Quadro deletado com sucesso.");
+    return Results.Ok("Quadro excluído com sucesso.");
 });
 
 app.MapPost("/api/tarefa/criar", async ([FromBody] Tarefas tarefa, [FromServices] AppDataContext ctx) =>

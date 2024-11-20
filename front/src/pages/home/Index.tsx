@@ -13,6 +13,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import { Button, Typography } from "@mui/material";
+import ModalExcluirQuadro from "../components/ModalExcluirQuadro";
 
 type Quadro = {
     tituloQuadro: string;
@@ -38,7 +39,9 @@ const Home = () => {
     const [tarefas, setTarefas] = useState<Tarefa[]>([]);
     const [usuario, setUsuario] = useState<Usuario | null>(null);
     const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openModalExcluir, setOpenModalExcluir] = useState<boolean>(false);
     const [idTarefa, setIdTarefa] = useState<number | undefined>(undefined);
+    const [idQuadro, setIdQuadro] = useState<number | undefined>(undefined);
 
     useEffect(() => {
         DragAndDrop();
@@ -77,7 +80,6 @@ const Home = () => {
                         }
                     });
                     setTarefas(responseTarefas.data);
-                    console.log(responseTarefas.data)
                 } catch (error) {
                     console.error("Erro:", error);
                 }
@@ -85,7 +87,7 @@ const Home = () => {
         };
 
         pegarSessao();
-    }, [idUsuario, navigate, openModal]);
+    }, [idUsuario, navigate, openModal, openModalExcluir]);
 
     const logout = () => {
         localStorage.removeItem("user");
@@ -113,7 +115,10 @@ const Home = () => {
                                 <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
                                     <h3>{quadro.tituloQuadro}</h3>
                                     <div style={{ display: "flex", justifyContent: "space-between" }}>
-                                        <IconButton aria-label="deletar" sx={{ color: "red" }}>
+                                        <IconButton aria-label="deletar" sx={{ color: "red" }} onClick={() => {
+                                            setIdQuadro(quadro.idQuadro);
+                                            setOpenModalExcluir(true);
+                                        }}>
                                             <DeleteIcon />
                                         </IconButton>
                                         <hr style={{ height: "50%", marginTop: "15px" }} />
@@ -154,6 +159,7 @@ const Home = () => {
             </div>
 
             <ModalTarefa openModal={openModal} setOpenModal={setOpenModal} idTarefa={idTarefa} />
+            <ModalExcluirQuadro openModalExcluir={openModalExcluir} setOpenModalExcluir={setOpenModalExcluir} idQuadro={idQuadro} />
         </div>
     );
 };
