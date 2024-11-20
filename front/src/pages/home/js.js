@@ -37,6 +37,18 @@ function DragAndDrop() {
             if (newBoardId) {
                 try {
                     console.log(`Card ${cardId} moved to board ${newBoardId}`);
+                    const response = await fetch(`http://localhost:5129/api/tarefa/atualizar/quadro/${cardId}/`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                        body: JSON.stringify({
+                            IdQuadro: newBoardId
+                        })
+                    });
+
+                    await response.json();
                 } catch (error) {
                     console.error("Erro ao mover o card:", error);
                 }

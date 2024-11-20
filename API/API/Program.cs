@@ -182,6 +182,30 @@ app.MapPut("/api/tarefa/atualizar/{id}", async (int id, [FromBody] Tarefas taref
     return Results.Ok("Tarefa atualizada com sucesso.");
 });
 
+
+app.MapPut("/api/tarefa/atualizar/quadro/{idTarefa}", async (int idTarefa, [FromBody] Tarefas tarefaAtualizada, [FromServices] AppDataContext ctx) =>
+{
+    Console.WriteLine($"Recebido: idTarefa = {idTarefa}, IdQuadro = {tarefaAtualizada.IdQuadro}");
+
+    // Buscar a tarefa pelo Id no banco de dados
+    var tarefa = await ctx.Tarefas.FindAsync(idTarefa);
+    
+    if (tarefa == null)
+    {
+        return Results.NotFound("Tarefa não encontrada.");
+    }
+
+    // Atualizar os campos da tarefa, se fornecidos
+    tarefa.IdQuadro = tarefaAtualizada.IdQuadro ?? tarefa.IdQuadro;
+    
+
+    // Salvar as mudanças no banco de dados
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok("Tarefa atualizada com sucesso.");
+});
+
+
 app.MapDelete("/api/tarefa/deletar/{id}", async (int id, [FromServices] AppDataContext ctx) =>
 {
     // Buscar a tarefa pelo Id no banco de dados

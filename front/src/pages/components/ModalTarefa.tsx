@@ -223,7 +223,7 @@ const ModalTarefa: React.FC<ModalTarefaProps> = ({ openModal, setOpenModal, idTa
                     <Button onClick={handleDelete} color="success" variant="contained" size="small">Sim</Button>
                     </DialogActions>
                 </Dialog>
-                </React.Fragment>
+            </React.Fragment>
         </Dialog>
         
     );
