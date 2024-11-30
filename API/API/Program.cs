@@ -107,6 +107,15 @@ app.MapGet("/api/quadro/listar/{id}", async (int id, [FromServices] AppDataConte
     return Results.Ok(quadros);
 });
 
+app.MapGet("/api/quadro/buscar/{id}", async (int id, [FromServices] AppDataContext ctx) => {
+    var quadro = await ctx.Quadros.SingleOrDefaultAsync(q => q.IdQuadro == id);
+
+    if (quadro == null)
+        return Results.NotFound(new { Message = "Quadro não encontrado." });
+
+    return Results.Ok(quadro);
+});
+
 app.MapPut("/api/quadro/atualizar/{id}", async (int id, [FromBody] Quadros quadroAtualizado, [FromServices] AppDataContext ctx) =>
 {
     var quadro = await ctx.Quadros.FindAsync(id);
